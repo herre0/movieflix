@@ -1,0 +1,187 @@
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+
+<head>
+  <title>MovieHunter</title>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  <link rel="stylesheet" href="css/style.css" type="text/css" media="all" />
+  <script type="text/javascript" src="js/jquery-1.4.2.min.js"></script>
+  <script type="text/javascript" src="js/jquery-func.js"></script>
+
+  <!--[if IE 6]><link rel="stylesheet" href="css/ie6.css" type="text/css" media="all" /><![endif]-->
+</head>
+
+<body>
+  <!-- START PAGE SOURCE -->
+  <div id="shell">
+    <div id="header">
+      <h1 id="logo"><a href="#">MERTFLIX</a></h1>
+      <div class="social" style="width: 35px !important;">
+        <!-- <a style="text-decoration: none; ">LOGIN </a> -->
+      </div>
+      <div id="navigation">
+        <ul>
+          <li><a href="index.html">HOME</a></li>
+          
+          <li><a target="_blank" href="https://www.linkedin.com/in/mert-kabadayi-209005198/">CONTACT</a></li>
+          <li><a href="/admin/index.html">ADMIN</a></li>
+        </ul>
+      </div>
+      <div id="sub-navigation">
+        <ul>
+          <li><a href="index.html">SHOW ALL</a></li>
+          <li onclick="getNewTrailers()"><a href="#">THIS WEEK TRAILERS</a></li>
+          <li onclick="getTopRated()"><a href="#">TOP RATED</a></li>
+          <!--sub categories I'll get those from sql queries-->
+          <li onclick="getImdbTop50()"><a href="#">IMDB TOP 50</a></li>
+        </ul>
+        <div id="search">
+          <form action="#" method="get" accept-charset="utf-8">
+            <label for="search-field">SEARCH</label>
+            <input onkeyup="search()" type="text" name="search field" placeholder="Enter search here" id="search-field"
+              class="blink search-field" />
+            <input type="button" value="GO!" class="search-button" />
+          </form>
+        </div>
+      </div>
+    </div>
+    <script>
+      var movie;
+
+      $().ready(function () {
+        var url = new URL(window.location.href);
+        var id = url.searchParams.get("id");
+        $.ajax({
+          url: "movie/" + id, success: function (result) {
+            movie = result;
+            document.getElementById("title").innerHTML = movie.title
+            document.getElementById("trailer-box").innerHTML = '<iframe id="trailer" width="840" height="457" src="' + movie.trailer + '" title="YouTube video player"' +
+              'frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>';
+            document.getElementById("image").src = '/css/images/' + movie.image;
+            document.getElementById("titleAndDate").innerHTML = movie.title + ' - ' + new Date(movie.releaseDate).getFullYear();
+            document.getElementById("imdb").innerHTML = 'IMDB: ' + movie.imdb;
+            document.getElementById("description").innerHTML = movie.description.substring(0, 800) + '...';
+            movie.directors.forEach((d) => {
+              let row = '<div class="child-cast-box"><img src="'+d.picture+'" width="70" /><br><span>'+ (d.name + d.surname).substring(0,11) +'</span></div>';
+              $('#director-box').append(row);
+            });
+
+            movie.cast.forEach((d) => {
+              let row = '<div class="child-cast-box"><img src="'+d.picture+'" width="70" /><br><span>'+ (d.name + d.surname).substring(0,11) +'</span></div>';
+              $('#cast-box').append(row);
+            });
+
+            console.log(result)
+
+          }
+        });
+      });
+
+      function showMore() {
+        document.getElementById("description").innerHTML = movie.description;
+        document.getElementById("showless").style.visibility = "visible";
+        document.getElementById("showmore").style.visibility = "hidden";
+      }
+
+      function showLess() {
+        document.getElementById("description").innerHTML = movie.description.substring(0, 800) + '...';
+        document.getElementById("showless").style.visibility = "hidden";
+        document.getElementById("showmore").style.visibility = "visible";
+
+      }
+    </script>
+
+    <div id="main">
+      <div class="content">
+        <span id="title" style="padding-top:20px;font-size: 34px;"></span>
+        <br><br>
+        <div id="trailer-box">
+
+        </div>
+
+
+        <br>
+        <br>
+        <br>
+
+        <div class="movie-info">
+          <div class="left-side">
+            <img style="width: 100% !important;" id="image" src="" />
+          </div>
+
+          <div class="right-side">
+            <span id="titleAndDate" style="font-size: 17px;">Kung Fu Panda - 2018</span><br>
+            <span id="imdb" style="font-size: 16px;">Imdb: 4.9</span><br>
+            <span id="description" style="font-size: 13px;">description</span>
+            <span onclick="showMore()" id="showmore" style=" cursor:pointer; color: #C89413;">&nbsp;Show More</span>
+            <span onclick="showLess()" id="showless"
+              style="visibility: hidden;cursor:pointer; color: #C89413;">&nbsp;Show Less</span>
+            <br>
+            <br>
+            <br>
+            <span style="font-size: 17px;">Directors</span><br>
+            <div id="director-box" class="cast-box">
+
+              
+            </div>
+            <br>
+            <br>
+            <span style="font-size: 20px;">Cast</span>
+            <div id="cast-box" class="cast-box">
+
+            </div>
+          </div>
+
+        </div>
+
+      </div>
+
+      <div class="cl">&nbsp;</div>
+    </div>
+    <div id="footer">
+      <p class="lf">Copyright &copy; 2021 <a href="#">MERTFLIX</a> - All Rights Reserved</p>
+      <p class="rf">Design by <a href="#">MERT KABADAYI</a></p>
+      <div style="clear:both;"></div>
+    </div>
+  </div>
+  <!-- END PAGE SOURCE -->
+</body>
+
+<style>
+  .movie-info {
+    background-color: black;
+    width: 840px;
+    min-height: 359px;
+    height: auto;
+    display: flex;
+  }
+
+  .left-side {
+    width: 20%;
+    height: 100%;
+    flex: 1;
+    padding: 10px;
+  }
+
+  .right-side {
+    width: 80%;
+    height: 100%;
+    padding: 10px;
+  }
+
+  .cast-box {
+    min-width: 70px;
+    width: auto;
+    height: 120px;
+    display: flex;
+
+  }
+
+  .child-cast-box {
+
+    padding-right: 12px !important;
+  }
+</style>
+
+</html>
